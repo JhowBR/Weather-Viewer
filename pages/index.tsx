@@ -1,47 +1,61 @@
-import { useState, useEffect } from "react"
+import { Component, ReactNode } from "react"
 import { OpenWeatherMap } from "../interfaces/OpenWeatherMap"
 import { CityWeatherView } from "../components/CityWeatherView"
-import TemperatureUnitSelector from "../components/TemperatureUnitSelector"
+import { UserInputsView } from "../components/UserInputsView"
 
 const API_KEY = '08f82dfbbe70f4dcda9de8d5499ea392'
 
-export default function Home() {
-    const [loading, setLoading] = useState(false)
-    const [data, setData] = useState<OpenWeatherMap.Root>(null)
-    const [temperatureUnit, setTemperatureUnit] = useState<OpenWeatherMap.Unit>(OpenWeatherMap.Unit.CELSIUS)
-    const [placeInputValue, setPlaceInputValue] = useState("London, UK")
+interface State {
+    isLoading: boolean
 
-    const onPlaceInputValueChange = (event) => {
-        setPlaceInputValue(event.target.value);
-    };
-    
-    const onSubmitBtnClick = async () => {
-        try {
-            if (placeInputValue == "")
-                throw "Place input value can't be null"
+    // User Inputs
+    placeInputValue: string
+    temperatureUnit: OpenWeatherMap.Unit
 
-            await fetchData()
+    // Fetched Data
+    cityName: string
+    countryName: string
+    temp: number
+    maxTemp: number
+    minTemp: number
+}
+
+export default class Home extends Component<null, State> {
+
+    constructor(params) {
+        super(params)
+
+        this.state = {
+            isLoading: true,
+            temperatureUnit: OpenWeatherMap.Unit.CELSIUS,
+            cityName: "None",
+            countryName: "",
+            temp: 0,
+            minTemp: 0,
+            maxTemp: 0,
+            placeInputValue: "Curitiba"
         }
-        catch (error) {
-            alert(error)
-        }
-    };
 
-    const fetchData = async () => {
+        this.submit("Curitiba", OpenWeatherMap.Unit.CELSIUS)
+    }
+
+    // Children prop callbacks
+
+    private handleTemperatureUnitChange = (unit: OpenWeatherMap.Unit) => this.submit(this.state.placeInputValue, unit)
+
+    private handlePlaceValueChange = (text: string) => this.setState({placeInputValue: text})
+
+    private handleSubmit = () => this.submit(this.state.placeInputValue, this.state.temperatureUnit)
+
+    private submit = async (placeValue: string, tempUnit: OpenWeatherMap.Unit) => {
+
+        console.log(`[REQUESTING] Place: ${ placeValue }; Temp unit: ${ tempUnit }`)
+
         try {
-            setLoading(true)
-
-            const response = await fetch(`http://api.openweathermap.org/data/2.5/weather?q=${placeInputValue}&APPID=${API_KEY}&units=${temperatureUnit}`) // GET
-            
-            if (!response.ok)
-                throw response.statusText
-            
-            const loaded_data = await response.json()
-
-            if (!loaded_data)
-                throw "Data was not loaded"
-
-            setData(loaded_data)
+            this.setLoading(true)
+            const res_data = await this.fetchData(placeValue, tempUnit)
+            const new_state = this.parseDataToState(res_data, placeValue, tempUnit)
+            this.setState(new_state)
         }
         catch (error) {
             const error_msg = 'Error while fetching data: ' + error
@@ -49,33 +63,67 @@ export default function Home() {
             alert(error_msg)
         }
         finally {
-            setLoading(false)
+            this.setLoading(false)
+        }
+    }
+
+    private setLoading(loading: boolean) {
+        if (this.state.isLoading !== loading)
+            this.setState({isLoading: loading})
+    }
+
+    private async fetchData(placeInput: string, temperatureUnit: OpenWeatherMap.Unit) {
+        const url = `http://api.openweathermap.org/data/2.5/weather?q=${placeInput}&APPID=${API_KEY}&units=${temperatureUnit}`
+        const response = await fetch(url) // GET
+        
+        if (!response.ok)
+            throw response.statusText
+        
+        const res_data: OpenWeatherMap.Root = await response.json()
+        
+        if (!res_data)
+            throw "Data was not loaded"
+        
+        return res_data
+    }
+
+    private parseDataToState(data: OpenWeatherMap.Root, place:string, unit: OpenWeatherMap.Unit) : State {
+        return {
+            isLoading: false,
+            placeInputValue: place,
+            temperatureUnit: unit,
+            cityName: data.name,
+            countryName: data.sys.country,
+            temp: data.main.temp,
+            maxTemp: data.main.temp_max,
+            minTemp: data.main.temp_min,
         }
     }
     
-    useEffect(() => {
-        fetchData()
-    }, [temperatureUnit])
-
-    return (
-    <div>
-        <input type="text" value={placeInputValue} placeholder="Curitiba, BR" onChange={onPlaceInputValueChange}/>
-        <button onClick={onSubmitBtnClick}>Submit</button>
-
-        <TemperatureUnitSelector onChange={setTemperatureUnit}/>
-
-        { loading && !data && <p>Loading data...</p> }
-
-        {data && (
-            <CityWeatherView
-            city={data.name}
-            country={data.sys.country}
-            temp={data.main.temp}
-            maxTemp={data.main.temp_max}
-            minTemp={data.main.temp_min}
-            />
-        )}
-    </div>
-    )
+    render (): ReactNode {
+        return (
+            <div className="container">                    
+                <UserInputsView
+                initialTempUnit={this.state.temperatureUnit}
+                initialPlaceInputValue={this.state.placeInputValue}
+                handlePlaceValueChange={this.handlePlaceValueChange}
+                handleTempUnitChange={this.handleTemperatureUnitChange}
+                handleSubmit={this.handleSubmit}
+                />
+                
+                {this.state.isLoading ?
+                    <p className="loadingP">Loading data...</p> :
+                    <CityWeatherView
+                    city={this.state.cityName}
+                    country={this.state.countryName}
+                    temp={this.state.temp}
+                    maxTemp={this.state.maxTemp}
+                    minTemp={this.state.minTemp}
+                    unit={this.state.temperatureUnit}
+                    />
+                }
+            </div>
+        )
+    }
 }
 

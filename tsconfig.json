@@ -22,7 +22,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx"
-, "pages/index.ts", "pages/api/weather.js"  ],
+, "pages/index.ts", "pages/api/weather.js", "pages/_app.tsx"  ],
   "exclude": [
     "node_modules"
   ]

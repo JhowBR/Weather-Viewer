@@ -1,21 +1,45 @@
 import { Component, ReactNode } from "react";
+import { OpenWeatherMap } from "../interfaces/OpenWeatherMap";
+import { cityWheaterModelFormater } from "../scripts/CityWeatherModelFormater";
 
-interface Props {
+export interface CityWeatherModel {
     city: string,
     country: string
     temp: number,
     maxTemp: number,
     minTemp: number,
+    unit: OpenWeatherMap.Unit
 }
 
-export class CityWeatherView extends Component<Props> {
+export interface CityWeatherViewModel {
+    cityAndCountry: string
+    temp: string
+    maxTemp: string
+    minTemp: string
+}
+
+export class CityWeatherView extends Component<CityWeatherModel> {
     render(): ReactNode {
+        const view_model = cityWheaterModelFormater({
+            city: this.props.city,
+            country: this.props.country,
+            temp: this.props.temp,
+            minTemp: this.props.minTemp,
+            maxTemp: this.props.maxTemp,
+            unit: this.props.unit
+        })
+
         return (
-            <div>
-                <h3>Temperature of {this.props.city + ", " + this.props.country}</h3>
-                <h4>{this.props.temp}</h4>
-                <h4>Max: {this.props.maxTemp}</h4>
-                <h4>Min: {this.props.minTemp}</h4>
+            <div className="cityWeatherView">
+                <h3>Temperature of {view_model.cityAndCountry}</h3>
+                <div className="tempContainer">
+                    <span className="temp">{view_model.temp}</span>
+                    <div>
+                        <span className="otherTemps">{view_model.maxTemp}</span>
+                        <br />
+                        <span className="otherTemps">{view_model.minTemp}</span>
+                    </div>
+                </div>
             </div>
         )
     }
