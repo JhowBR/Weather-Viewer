@@ -14,23 +14,33 @@ export class UserInputsView extends Component<Props> {
 
     handlePlaceInputValueChange = (event) => this.props.handlePlaceValueChange(event.target.value)
 
-    handlePlaceInputKeyDown = (event) => event.key === "Enter" && this.props.handleSubmit()
+    handlePlaceInputKeyDown = (event) => {
+        if (event.key === "Enter") {
+            if (!event.target.value.trim())
+                alert("Type something before submit");
+            else
+                this.props.handleSubmit();
+        }
+    }
 
     render(): ReactNode {
         return (
             <div className="userInputs">
                 <span>Type a city and press ENTER</span>
+
                 <input
-                className="placeInput"
-                type="text"
-                placeholder="Curitiba, BR"
-                onKeyDown={this.handlePlaceInputKeyDown}
-                onChange={this.handlePlaceInputValueChange}
+                    className="placeInput"
+                    type="text"
+                    placeholder="Curitiba, BR"
+                    onKeyDown={this.handlePlaceInputKeyDown}
+                    onChange={this.handlePlaceInputValueChange}
                 />
+
                 <TemperatureUnitSelector
-                initial={this.props.initialTempUnit}
-                onChange={this.props.handleTempUnitChange}
+                    initial={this.props.initialTempUnit}
+                    onChange={this.props.handleTempUnitChange}
                 />
+                
                 <button className="btn" onClick={this.props.handleSubmit}>{">"}</button>
             </div>
         )
