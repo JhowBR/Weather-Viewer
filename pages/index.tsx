@@ -83,7 +83,7 @@ export default class Home extends Component<null, State> {
         
         if (!res_data)
             throw "Data was not loaded"
-        
+
         return res_data
     }
 
