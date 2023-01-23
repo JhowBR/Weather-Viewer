@@ -20,12 +20,12 @@ class TemperatureUnitSelector extends Component<Props> {
             type="radio"
             name="temperatureUnit"
             className='unitInput'
-            id={OpenWeatherMap.Unit.FAHRENHEIT}
-            value={OpenWeatherMap.Unit.FAHRENHEIT}
-            checked={this.props.initial === OpenWeatherMap.Unit.FAHRENHEIT}
+            id={OpenWeatherMap.Unit.CELSIUS}
+            value={OpenWeatherMap.Unit.CELSIUS}
+            checked={this.props.initial === OpenWeatherMap.Unit.CELSIUS}
             onChange={this.handleChange}
           />
-          <label htmlFor={OpenWeatherMap.Unit.FAHRENHEIT}>Fahrenheit</label>
+          <label htmlFor={OpenWeatherMap.Unit.CELSIUS}>Celsius</label>
         </div>
 
         <div className="unitInput">
@@ -33,12 +33,12 @@ class TemperatureUnitSelector extends Component<Props> {
             type="radio"
             name="temperatureUnit"
             className='unitInput'
-            id={OpenWeatherMap.Unit.CELSIUS}
-            value={OpenWeatherMap.Unit.CELSIUS}
-            checked={this.props.initial === OpenWeatherMap.Unit.CELSIUS}
+            id={OpenWeatherMap.Unit.FAHRENHEIT}
+            value={OpenWeatherMap.Unit.FAHRENHEIT}
+            checked={this.props.initial === OpenWeatherMap.Unit.FAHRENHEIT}
             onChange={this.handleChange}
           />
-          <label htmlFor={OpenWeatherMap.Unit.CELSIUS}>Celsius</label>
+          <label htmlFor={OpenWeatherMap.Unit.FAHRENHEIT}>Fahrenheit</label>
         </div>
 
         <div className="unitInput">

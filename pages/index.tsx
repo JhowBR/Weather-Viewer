@@ -73,7 +73,7 @@ export default class Home extends Component<null, State> {
     }
 
     private async fetchData(placeInput: string, temperatureUnit: OpenWeatherMap.Unit) {
-        const url = `http://api.openweathermap.org/data/2.5/weather?q=${placeInput}&APPID=${API_KEY}&units=${temperatureUnit}`
+        const url = `https://api.openweathermap.org/data/2.5/weather?q=${placeInput}&APPID=${API_KEY}&units=${temperatureUnit}`
         const response = await fetch(url) // GET
         
         if (!response.ok)

@@ -2,7 +2,7 @@ import { CityWeatherModel, CityWeatherViewModel } from "../components/CityWeathe
 import { OpenWeatherMap } from "../interfaces/OpenWeatherMap"
 
 export function cityWheaterModelFormater(model: CityWeatherModel): CityWeatherViewModel {
-    const city_and_country = capitalize(model.city) + ", " + model.country.toUpperCase()
+    const city_and_country = capitalizeWords(model.city) + ", " + model.country.toUpperCase()
     const symbol = getSymbolOfUnit(model.unit)
 
     return {
@@ -13,16 +13,22 @@ export function cityWheaterModelFormater(model: CityWeatherModel): CityWeatherVi
     }
 }
 
-function capitalize(text: string) {
-    return text[0].toUpperCase() + text.slice(1).toLowerCase();
+function capitalizeWords(text: string) {
+    const words = text.split(" ")
+    const capitalized_words = words.map(w => capitalizeFirstLetter(w))
+    return capitalized_words.join(" ")
 }
 
-function getKeyNameByValue(value: OpenWeatherMap.Unit) { // not using...
+function capitalizeFirstLetter(text: string): string {
+    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+}
+
+function getKeyNameByValue(value: OpenWeatherMap.Unit): string { // not using...
     const indexOfS = Object.values(OpenWeatherMap.Unit).indexOf(value);
     return Object.keys(OpenWeatherMap.Unit)[indexOfS];
 }
 
-function getSymbolOfUnit(unit: OpenWeatherMap.Unit) {
+function getSymbolOfUnit(unit: OpenWeatherMap.Unit): string {
     let symbol = ""
 
     if (unit === OpenWeatherMap.Unit.CELSIUS)
